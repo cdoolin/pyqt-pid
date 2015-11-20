@@ -17,7 +17,7 @@ Project {
     }
     Files {
         directory: "."
-        filter: "*.py"
+        filter: "*.py;README"
     }
 
     /* List of plugin directories passed to QML runtime */
