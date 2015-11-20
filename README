@@ -1,0 +1,28 @@
+Configuring Qt Creator
+----------------------
+
+For some reason QtCreator 3.4 disables qmlprojects by default, so you have to
+go to About Plugins in the menu and enable QmlProjectManager.
+
+
+
+
+
+
+On Windows:
+-----------
+
+Since Qt Creator is probably installed with it's own Qt libraries (although
+not required), and PyQt5 comes with it's own too,  it is necessary to
+change the run environment to the "system environment" in the project setting
+
+
+On OSX:
+-------
+
+PyQt5 apperently has issues with OSX, talked about here:
+http://pyqt.sourceforge.net/Docs/PyQt5/platforms.html#os-x
+
+Can fix this by adding to the project's run environment the variable
+DYLD_FRAMEWORK_PATH pointing to /opt/local/libexec/qt5/lib (when qt5 is
+installed via macports)
