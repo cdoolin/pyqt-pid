@@ -103,6 +103,7 @@ Window {
                     text: control.text
                 }
             }
+            enabled: !daq_control.running
             onClicked: settings_panel.state = "on"
         }
 
@@ -116,20 +117,12 @@ Window {
 
             onClicked: {
                 console.log(checked)
-                if (checked) {
+                if (checked && !daq_control.running) {
                     daq_control.start();
-//                    start();
                 }
                 else
-                    daq_control.stop();
-//                daq_switch.checked = true;
-//                return true;
+                    daq_control.running = false
             }
-
-            Component.onCompleted: {
-                start.connect(worker.work);
-            }
-
         }
 
 
