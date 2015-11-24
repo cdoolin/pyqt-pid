@@ -9,68 +9,101 @@ Window {
     id: window
     visible: true
     title: "PID"
-    minimumWidth: 200
-    minimumHeight: 200
-    maximumWidth: 200
-    maximumHeight: 200
+    width: 300
+    height: 200
+    minimumWidth: width
+    minimumHeight: height
+    maximumWidth: width
+    maximumHeight: height
 
     FontLoader { source: "fontawesome-webfont.ttf" }
 
 
     Rectangle {
         id: pid_panel
-        width: 200
-        height: 200
+        width: parent.width
+        height: parent.height
         anchors.verticalCenterOffset: 0
         anchors.horizontalCenterOffset: 0
         anchors.centerIn: parent
-//        color: "red"
+        //        color: "red"
+
+        Image {
+            anchors.fill: parent
+            source: "pid-bg.svg"
+
+            SpinBox {
+                id: target_box
+                x: 14
+                y: 26
+                width: 60
+                height: 20
+                maximumValue: 10
+                stepSize: 0.01
+                value: 0.5
+                decimals: 3
+            }
+
+            TextField {
+                id: input_field
+                x: 14
+                y: 118
+                width: 60
+                height: 20
+                text: "0"
+                readOnly: true
+            }
+
+            SpinBox {
+                id: output_box
+                x: 230
+                y: 75
+                width: 60
+                height: 20
+                maximumValue: 100
+                stepSize: 1
+                decimals: 2
+            }
+
+            TextField {
+                id: textField1
+                x: 125
+                y: 24
+                width: 40
+                text: "0"
+                placeholderText: qsTr("Text Field")
+            }
+
+            TextField {
+                id: textField2
+                x: 125
+                y: 75
+                width: 40
+                text: "0.2"
+                placeholderText: qsTr("Text Field")
+            }
+
+            TextField {
+                id: textField3
+                x: 125
+                y: 120
+                width: 40
+                text: "0"
+                placeholderText: qsTr("Text Field")
+            }
+        }
 
         Switch {
             id: pid_switch
-            x: 8
-            y: 14
+            x: 244
+            y: 10
             checked: false
-        }
-
-        SpinBox {
-            id: target_box
-            x: 125
-            y: 92
-            width: 67
-            height: 20
-            maximumValue: 10
-            stepSize: 0.01
-            value: 0.5
-            decimals: 3
-        }
-
-        Label {
-            x: 8
-            y: 72
-            text: qsTr("Input")
-        }
-
-        TextField {
-            id: input_field
-            x: 8
-            y: 92
-            width: 80
-            height: 20
-            text: "0"
-            readOnly: true
-        }
-
-        Label {
-            x: 125
-            y: 72
-            text: qsTr("Target")
         }
 
         Button {
             id: transfer_button
-            x: 95
-            y: 92
+            x: 64
+            y: 161
             width: 20
             height: 20
             text: "\uf061"
@@ -88,17 +121,17 @@ Window {
 
         Button {
             id: settings_button
-            x: 168
+            x: 222
             y: 10
-            width: 24
-            height: 24
+            width: 16
+            height: 16
             text: "\uf013"
             style: ButtonStyle {
                 label: Text {
                     verticalAlignment: Text.AlignVCenter
                     horizontalAlignment: Text.AlignHCenter
                     font.family: "FontAwesome"
-                    font.pointSize: 14
+                    font.pointSize: 10
                     color: "#303030"
                     text: control.text
                 }
@@ -109,8 +142,8 @@ Window {
 
         Switch {
             id: daq_switch
-            x: 40
-            y: 71
+            x: 10
+            y: 163
             checked: false
 
             signal start()
@@ -127,22 +160,6 @@ Window {
 
 
 
-        Label {
-            x: 67
-            y: 138
-            text: qsTr("Output")
-        }
-        SpinBox {
-            id: output_box
-            x: 67
-            y: 158
-            width: 67
-            height: 20
-            maximumValue: 100
-            stepSize: 1
-            decimals: 2
-        }
-
     } // PID Panel
 
     Rectangle {
@@ -150,7 +167,7 @@ Window {
         color: "#adadad"
         width: parent.width
         height: parent.height
-        z: 2
+        z: -2
 
         state: "off"
         states: [
@@ -173,8 +190,8 @@ Window {
         }
 
         GridLayout {
-    //        anchors.left: parent.left
-    //        anchors.right: parent.right
+            //        anchors.left: parent.left
+            //        anchors.right: parent.right
             anchors.horizontalCenter: parent.horizontalCenter
             anchors.verticalCenter: parent.verticalCenter
             columns: 2
