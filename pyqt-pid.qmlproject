@@ -3,7 +3,7 @@
 import QmlProject 1.1
 
 Project {
-    mainFile: "0_hello_world.qml"
+    mainFile: "main.py"
 
     /* Include .qml, .js, and image files from current directory and subdirectories */
     QmlFiles {
@@ -16,7 +16,7 @@ Project {
         directory: "."
     }
     Files {
-        directory: "."
+        directory: "./"
         filter: "*.py;README"
     }
 

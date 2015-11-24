@@ -9,8 +9,8 @@ Window {
     id: window
     visible: true
     title: "PID"
-    width: 300
-    height: 200
+    width: 320
+    height: 170
     minimumWidth: width
     minimumHeight: height
     maximumWidth: width
@@ -28,101 +28,140 @@ Window {
         anchors.centerIn: parent
         //        color: "red"
 
+        MouseArea {
+            // fill panel with a mouse area to deactivate fields
+            // and submit changes when clicked
+            anchors.fill: parent
+            acceptedButtons: Qt.LeftButton
+            onClicked: pid_panel.forceActiveFocus()
+        }
+
         Image {
             anchors.fill: parent
             source: "pid-bg.svg"
+        }
 
-            SpinBox {
-                id: target_box
-                x: 14
-                y: 26
-                width: 60
-                height: 20
-                maximumValue: 10
-                stepSize: 0.01
-                value: 0.5
-                decimals: 3
-            }
+        SpinBox {
+            id: target_spin
+            x: 10
+            y: 26
+            width: 70
+            height: 20
+            suffix: " V"
+            maximumValue: 10
+            stepSize: 0.01
+            decimals: 3
 
-            TextField {
-                id: input_field
-                x: 14
-                y: 118
-                width: 60
-                height: 20
-                text: "0"
-                readOnly: true
-            }
-
-            SpinBox {
-                id: output_box
-                x: 230
-                y: 75
-                width: 60
-                height: 20
-                maximumValue: 100
-                stepSize: 1
-                decimals: 2
-            }
-
-            TextField {
-                id: textField1
-                x: 125
-                y: 24
-                width: 40
-                text: "0"
-                placeholderText: qsTr("Text Field")
-            }
-
-            TextField {
-                id: textField2
-                x: 125
-                y: 75
-                width: 40
-                text: "0.2"
-                placeholderText: qsTr("Text Field")
-            }
-
-            TextField {
-                id: textField3
-                x: 125
-                y: 120
-                width: 40
-                text: "0"
-                placeholderText: qsTr("Text Field")
+            value: pid_control.target
+            onEditingFinished: {
+                pid_control.target = value
             }
         }
+
+        TextField {
+            id: input_field
+            x: 15
+            y: 123
+            width: 60
+            height: 20
+            horizontalAlignment: Qt.AlignHCenter
+            text: pid_control.input.toFixed(3) + " V"
+            readOnly: true
+        }
+
+        SpinBox {
+            id: output_spin
+            x: 239
+            y: 75
+            width: 70
+            height: 20
+            suffix: " %"
+            maximumValue: 100
+            stepSize: 1
+            decimals: 2
+
+            value: pid_control.output
+            onEditingFinished: {
+                pid_control.output = value
+            }
+        }
+
+        SpinBox {
+            id: kp_spin
+            x: 116
+            y: 25
+            width: 55
+            height: 20
+            stepSize: 0.02
+            decimals: 2
+
+            value: pid_control.kp
+            onEditingFinished: {
+                pid_control.kp = value
+            }
+        }
+
+        SpinBox {
+            id: ki_spin
+            x: 116
+            y: 75
+            width: 55
+            height: 20
+            stepSize: 0.02
+            decimals: 2
+
+            value: pid_control.ki
+            onEditingFinished: {
+                pid_control.ki = value
+            }
+        }
+
+        SpinBox {
+            id: kd_spin
+            x: 116
+            y: 120
+            width: 55
+            height: 20
+            stepSize: 0.02
+            decimals: 2
+
+            value: pid_control.kd
+            onEditingFinished: {
+                pid_control.kd = value
+            }
+        }
+
+        CheckBox {
+            id: inverse_check
+            x: 78
+            y: 68
+            onClicked: {
+                pid_control.inverse = checked;
+            }
+        }
+
 
         Switch {
             id: pid_switch
-            x: 244
-            y: 10
-            checked: false
-        }
+            x: 264
+            y: 8
+            checked: pid_control.running
 
-        Button {
-            id: transfer_button
-            x: 64
-            y: 161
-            width: 20
-            height: 20
-            text: "\uf061"
-            style: ButtonStyle {
-                label: Text {
-                    verticalAlignment: Text.AlignVCenter
-                    horizontalAlignment: Text.AlignHCenter
-                    font.family: "FontAwesome"
-                    font.pointSize: 10
-                    color: "#303030"
-                    text: control.text
+            onClicked: {
+                if (checked) {
+                    pid_control.start()
+                } else {
+                    pid_control.running = false
                 }
             }
+
+
         }
 
         Button {
             id: settings_button
-            x: 222
-            y: 10
+            x: 242
+            y: 8
             width: 16
             height: 16
             text: "\uf013"
@@ -132,58 +171,37 @@ Window {
                     horizontalAlignment: Text.AlignHCenter
                     font.family: "FontAwesome"
                     font.pointSize: 10
-                    color: "#303030"
+                    color: pid_control.running ? "#909090" :  "#303030"
                     text: control.text
                 }
             }
-            enabled: !daq_control.running
-            onClicked: settings_panel.state = "on"
+            enabled: !pid_control.running
+            onClicked: pid_control.unconfigure()
         }
-
-        Switch {
-            id: daq_switch
-            x: 10
-            y: 163
-            checked: false
-
-            signal start()
-
-            onClicked: {
-                console.log(checked)
-                if (checked && !daq_control.running) {
-                    daq_control.start();
-                }
-                else
-                    daq_control.running = false
-            }
-        }
-
-
-
     } // PID Panel
 
     Rectangle {
         id: settings_panel
-        color: "#adadad"
+        color: "#c0c0c0"
         width: parent.width
         height: parent.height
-        z: -2
+        z: 2
 
-        state: "off"
+        state: pid_control.configured? "off" : "on"
         states: [
             State {
                 name: "on"
-                PropertyChanges {target: settings_panel; x: 0}
+                PropertyChanges {target: settings_panel; y: 0}
             },
             State {
                 name: "off"
-                PropertyChanges {target: settings_panel; x: settings_panel.width}
+                PropertyChanges {target: settings_panel; y: -settings_panel.height}
             }
         ]
 
         transitions: Transition {
             NumberAnimation {
-                properties: "x"
+                properties: "y"
                 easing.type: Easing.InOutQuad
                 duration: 500
             }
@@ -199,47 +217,55 @@ Window {
             Text { text: "Channel: "; Layout.alignment: Qt.AlignRight }
             TextField {
                 id: channel_field
-                text: daq_control.channel
-                onEditingFinished: daq_control.channel = text
+                text: "/dev2/ai0"
+                onAccepted: ok_button.configure()
             }
 
             Text { text: "Sample Rate: "; Layout.alignment: Qt.AlignRight }
             TextField {
                 id: rate_field
-                text: daq_control.rate
+                text: "100"
                 validator: IntValidator {bottom: 1; top: 10000}
-                onEditingFinished: daq_control.rate = text
+                onAccepted: ok_button.configure()
             }
 
             Text { text: "Max Volt: "; Layout.alignment: Qt.AlignRight }
             TextField {
                 id: maxv_field
-                text: daq_control.maxv
+                text: "2"
                 validator: DoubleValidator {
                     decimals: 1
                     bottom: 0
                     top: 10.
                 }
-                onEditingFinished: daq_control.maxv = text
+                onAccepted: ok_button.configure()
             }
 
             Text { text: "lasernet: "; Layout.alignment: Qt.AlignRight }
             TextField {
                 id: lasernet_field
-                text: "localhost"
+                text: "farfetchd"
+                onAccepted: ok_button.configure()
             }
 
             Item {width: 1}
-
             Button {
+                id: ok_button
                 text: "OK"
                 Layout.alignment: Qt.AlignRight
 
-                onClicked: {
+                function configure() {
                     // take focus away from text fields causing editingFinished signals
                     pid_panel.forceActiveFocus()
-                    settings_panel.state = "off"
+    //                    settings_panel.state = "off"
+                    pid_control.configure(
+                                channel_field.text,
+                                rate_field.text,
+                                maxv_field.text,
+                                lasernet_field.text);
                 }
+
+                onClicked: configure()
             }
         } // Settings Grid Layout
     } // Settings Panel
